@@ -32,3 +32,7 @@ Récupérer le dépôt courant, et installez-le sur le serveur.
     * ```start```: date du début du podcast
     * ```day``: numéro du jour de sortie hebdomadaire du podcast (0: dimanche, 1: lundi, ...)
 * rendre accessible le répertoire ```web``` pour qu'il soit accessible par une url ```http``` ou ```https```.
+
+## Remarque
+
+Le fichier ```web/db/agents.json``` est issu du projet [prx-podagent](https://github.com/PRX/prx-podagent).
