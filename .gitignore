@@ -1,0 +1,11 @@
+*.csv
+*.log
+*.json
+*.txt
+*.new
+node_modules/
+*.old
+*.backup
+config.js
+index.html
+config.sh

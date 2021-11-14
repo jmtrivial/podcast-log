@@ -1,0 +1,65 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Statistiques</title>
+        <script src="node_modules/d3/dist/d3.min.js"></script>
+        
+        <script src="js/config.js"></script>
+        <script src="js/script.js"></script>
+        
+        <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="node_modules/bootstrap-dark/src/bootstrap-dark.css">
+        <script src="node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+        
+        <style>
+             
+
+            table.layout_fixed { table-layout: fixed; }
+            table { color: #fff; font-size: 70%; }
+            
+            #episodes {
+                columns: 3;
+                -webkit-columns: 3;
+                -moz-columns: 3;
+            }
+        </style>
+    </head>
+    <body class="bootstrap bootstrap-dark">
+        <div id="page" class="container-fluid">
+            <h1>Statistiques</h1>
+            <h2>Épisodes</h2>
+            <ul id="episodes"><li><em>récupération en cours...</em></li></ul>
+            
+            <h2>Résumé des écoutes des épisodes</h2>
+            <div id="resume"></div>
+            <p>Audience moyenne d'un épisode&nbsp;: <span id="moyenne"></span> (min : <span id="min"></span>, max : <span id="max"></span>)</p>
+
+            <h2>Synthèse</h2>
+            <div id="synthese"><em>récupération en cours...</em></div>
+
+            <h2>Écoutes hebdomadaires</h2>
+            <p>Dates importantes&nbsp:</p>
+            <div id="ecoutes_hebdomadaires"><em>récupération en cours...</em></div>
+
+            <h2>Nombre d'écoute des épisodes</h2>
+            <div id="ecoutes_totales"><em>récupération en cours...</em></div>
+            
+            <h2>Écoutes des semaines passées</h2>
+            <div id="synthese_autres_semaines"><em>récupération en cours...</em></div>
+            <div id="ecoutes_premiere_semaine"><em>récupération en cours...</em></div>
+            
+            <h2>Dernières écoutes</h2>
+            <p>Liste des écoutes des dernières heures.</p>
+            <div id="dernieres_ecoutes"><em>récupération en cours...</em></div>
+            
+            <h2>Sources des écoutes</h2>
+            <div id="ecoutes_totales_code"><em>récupération en cours...</em></div>
+
+            <div id="sources"><em>récupération en cours...</em></div>
+            
+            <h2>Passage des robots</h2>
+            <div id="robots"><em>récupération en cours...</em></div>
+        </div>
+    </body>
+</html>
