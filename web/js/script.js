@@ -1001,7 +1001,7 @@ class Logs {
         
         
         var lines = [];
-        const nb_hours_list = config.nb_hours_list;
+        const nb_hours_list = Config.nb_hours_list;
         var start_list = new Date(this.now - 1000 * 60 * 60 * nb_hours_list);
         for(let row in this.data) {
             const day = new Date(this.data[row]["timestamp"] * 1000);
