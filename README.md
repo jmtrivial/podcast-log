@@ -30,7 +30,8 @@ Récupérer le dépôt courant, et installez-le sur le serveur.
     * ```known_ips```: un tableau défini comme une liste d'adresses ip (sous forme de chaîne de caractère), qui seront identifiées par une étoile dans la liste des connexions (si on veut suivre des connexions en particulier)
     * ```rss```: l'adresse ```https``` du flux rss correspondant au podcast (pour l'affichage en haut de page)
     * ```start```: date du début du podcast
-    * ```day``: numéro du jour de sortie hebdomadaire du podcast (0: dimanche, 1: lundi, ...)
+    * ```day```: numéro du jour de sortie hebdomadaire du podcast (0: dimanche, 1: lundi, ...)
+    * ```nb_hours_list```: nombre d'heures considérées pour afficher les dernières écoutes.
 * rendre accessible le répertoire ```web``` pour qu'il soit accessible par une url ```http``` ou ```https```.
 
 ## Remarque
