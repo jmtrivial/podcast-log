@@ -59,13 +59,25 @@ class Logs {
     }
 
 
-    
-    static nbToEpisode(i) {
-        if (i < 10)
-            return "S01E0" + i;
+
+    static nbToEpisode(s, i) {
+        let r = "S";
+        if (s < 10)
+            r += "0" + s;
         else
-            return "S01E" + i;
-            
+            r += s;
+        r += "E";
+        if (i < 10)
+            r += "0" + i;
+        else
+            r += i;
+        return r;
+    }
+
+    static episodeToNbs(episode) {
+        let s = episode.substring(1, 3);
+        let e = episode.substring(4, 6);
+        return [s, e]
     }
     
     static toHex(d) {
@@ -342,21 +354,32 @@ class Logs {
         return result;
     }
 
-    build_publication_date(start) {
-        this.start = start;
+    build_publication_date(seasons) {
+        this.start = seasons[0][0];
+        let s = 1;
         this.now = new Date;
-        let c = new Date(start);
-        this.publicationDate = { "S01E00": start };
+        let c = new Date(this.start);
+        let cnext = new Date(seasons[1][0]);
+        this.publicationDate = { "S01E00": this.start };
         var i = 1;
-        while(c < this.now) {
-            this.publicationDate[Logs.nbToEpisode(i)] = new Date(c);
-            i += 1;
-            c.setDate(c.getDate() + 7);
+        while(c <= this.now) {
+            while(c < cnext) {
+                this.publicationDate[Logs.nbToEpisode(s, i)] = new Date(c);
+                i += 1;
+                c.setDate(c.getDate() + seasons[s - 1][1]);
+            }
+            i = 0;
+            s += 1;
+            if (s in seasons)
+                cnext = new Date(seasons[s][0]);
+            else
+                cnext = this.now;
+        }
 
-        };
     }
     
-    build_dl_structure(db, start) {
+    build_dl_structure(db, seasons) {
+        let start = this.start;
         this.db = db;
         db.agents.forEach(function(a) {
             a.regex = new RegExp(a.regex, a.ignorecase ? 'i' : undefined);
@@ -537,8 +560,8 @@ class Logs {
         var other = {};
         for(var eid in this.episodes) {
             var episode = this.episodes[eid];
-            var s = parseInt(eid) + 1;
-            
+            var s = this.episode2week(episode);
+
             var total = 0;
             if ((episode in this.dl_week) && (s in this.dl_week[episode])) {
                 nb = this.dl_week[episode][s]["total"];
@@ -569,7 +592,7 @@ class Logs {
 
         for(eid in this.episodes) {
             var episode = this.episodes[eid];
-            var s = parseInt(eid) + 1;
+            var s = this.episode2week(episode);
 
             var nb = other[s];
             table += '<td';
@@ -641,7 +664,7 @@ class Logs {
             for (var e in this.dl_week)
                 if (s in this.dl_week[e]) {
                     t_w[s] += this.dl_week[e][s]["total"];
-                    if (Logs.nbToEpisode(s - 1).toLowerCase() == e)
+                    if (this.episode2week(e) == s)
                         c_w[s] += this.dl_week[e][s]["total"];
                     else
                         o_w[s] += this.dl_week[e][s]["total"];
@@ -730,7 +753,7 @@ class Logs {
                     if (week_day < 0) week_day += 7;
                     var hour = day.getHours();
                     var current_week = (week_id == this.nb_weeks_total);
-                    var current_podcast = (this.data[row]["episode"] == Logs.nbToEpisode(week_id - 1).toLowerCase());
+                    var current_podcast = this.episode2week(this.data[row]["episode"]) == week_id;
                     if (current_week) {
                         if (current_podcast) {
                             current_week_current_podcast[week_day][hour] += 1;
@@ -789,10 +812,13 @@ class Logs {
             min_first_week[s] = -1;
             max_first_week[s] = 0;
             sum_first_week [s] = 0;
-            var first = 0;
             for(let eid in this.episodes) {
                 const episode = this.episodes[eid];
+                console.log("eid", eid);
                 var nb;
+                let idweek = this.episode2week(episode);
+                var first = (idweek - 1) * 7;
+
                 if (s + first in this.dl[episode])
                     nb = this.dl[episode][s + first]["total"];
                 else
@@ -806,7 +832,6 @@ class Logs {
                     else
                         sum_first_week_per_ep[eid] = nb;
                 }
-                first += 7;
             }    
         }
         var max_w = 0;
@@ -818,12 +843,13 @@ class Logs {
         table += "</tr>";
         table += "</thead>";
         table += "<tbody>";
-        var first = 0;
-        
+
         for(let eid in this.episodes) {
             const episode = this.episodes[eid];
             var nb_week = 0;
-            const idweek = parseInt(eid) + 1;
+            let idweek = this.episode2week(episode);
+            var first = (idweek - 1) * 7;
+
             if (idweek in this.dl_week[episode])
                 nb_week = this.dl_week[episode][idweek]["total"];
             if (nb_week != 0) {
@@ -847,7 +873,6 @@ class Logs {
                 table += '>' + sum + "</td>";
                 table += "</tr>";
             }
-            first += 7;
         }
         table += "</tbody>";
         table += "<tfooter>";
@@ -1135,11 +1160,25 @@ class Logs {
         $("#max").html(this.max);
         $("#min").html(this.min);
     }
-    
-    constructor(rss, start) {
+
+    episode2week(episode) {
+        const nb = Logs.episodeToNbs(episode);
+        const diffTime = Math.abs(this.seasons[nb[0] - 1][0] - this.seasons[0][0]);
+        let nb_weeks_first_episode = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+        const shift = this.seasons[nb[0] - 1][1] / 7;
+        if (nb_weeks_first_episode == 0) // Pourquoi ?
+            nb_weeks_first_episode += 1;
+        return nb_weeks_first_episode + shift * nb[1];
+
+    }
+
+
+    constructor(rss, seasons) {
         // build publication date
         
-        this.build_publication_date(start);
+        this.seasons = seasons;
+        this.build_publication_date(seasons);
+
         
         var logs = this;
 
@@ -1151,7 +1190,7 @@ class Logs {
             // compute number of dl per day, per episode, per htmlcode
             $.getJSON('db/agents.json', function(db) {
 
-                logs.build_dl_structure(db, start);
+                logs.build_dl_structure(db, seasons);
 
                 logs.generate_episode_list(rss);
                 
@@ -1185,6 +1224,6 @@ class Logs {
     
 }
 
-log = new Logs(Config.rss, Config.start);
+log = new Logs(Config.rss, Config.seasons);
 
 
